@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mechanic Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .nav { display: flex; background: #333; color: white; }
+    .nav-btn { padding: 15px 25px; background: none; border: none; color: white; cursor: pointer; }
+    .nav-btn.active, .nav-btn:hover { background: #555; }
+    .tab { display: none; background: white; padding: 20px; border-radius: 8px; margin-top: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .tab.active { display: block; }
+    .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fafafa; }
+    button { padding: 8px 16px; margin: 5px; cursor: pointer; border: none; border-radius: 4px; }
+    .accept-btn { background: #28a745; color: white; }
+    .reject-btn { background: #dc3545; color: white; }
+    .done-btn   { background: #007bff; color: white; }
+    #profile-pic { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Mechanic Dashboard</h1>
+
+  <div class="nav">
+    <button class="nav-btn active" data-tab="home">Pending Requests</button>
+    <button class="nav-btn" data-tab="active-requests">Active Jobs</button>
+    <button class="nav-btn" data-tab="requests">History</button>
+    <button class="nav-btn" data-tab="profile">Profile</button>
+  </div>
+
+  <!-- ==================== PENDING TAB ==================== -->
+  <div id="home-tab" class="tab active">
+    <h2>Pending Requests</h2>
+    <div id="pending-requests">Loading...</div>
+  </div>
+
+  <!-- ==================== ACTIVE TAB ==================== -->
+  <div id="active-requests-tab" class="tab">
+    <h2>Active (Accepted) Jobs</h2>
+    <div id="active-request-list">Loading...</div>
+  </div>
+
+  <!-- ==================== HISTORY TAB ==================== -->
+  <div id="requests-tab" class="tab">
+    <h2>Completed Jobs</h2>
+    <div id="history-requests">Loading...</div>
+  </div>
+
+  <!-- ==================== PROFILE TAB ==================== -->
+  <div id="profile-tab" class="tab">
+    <h2>My Profile</h2>
+    <img id="profile-pic" src="/images/mechanics/default.jpg" alt="Profile">
+    <p><strong>Name:</strong> <input type="text" id="profile-name" readonly></p>
+    <p><strong>Age:</strong> <input type="text" id="profile-age" readonly></p>
+    <p><strong>Email:</strong> <input type="text" id="profile-email" readonly></p>
+    <p><strong>Phone:</strong> <input type="text" id="profile-phone" readonly></p>
+    <p><strong>Location:</strong> <input type="text" id="profile-address" readonly></p>
+  </div>
+</div>
+
+<script>
+// ==================== AUTH CHECK ====================
+const mechanicId = localStorage.getItem("user_nid");
+if (!mechanicId) {
+  alert("You must be logged in!");
+  window.location.href = "/pages/login/login.html";
+}
+
+// ==================== PENDING REQUESTS ====================
+async function loadPendingRequests() {
+  const container = document.getElementById("pending-requests");
+  try {
+    const res = await fetch(`/pending/${mechanicId}`);
+    if (!res.ok) throw new Error("Server error");
+    const list = await res.json();
+
+    if (list.length === 0) {
+      container.innerHTML = "<p>No pending requests right now.</p>";
+      return;
+    }
+
+    container.innerHTML = list.map(r => `
+      <div class="card">
+        <strong>${r.user_name || "User"}</strong><br>
+        Phone: ${r.user_phone || "—"}<br>
+        Vehicle: ${r.vehicle || "—"}<br>
+        Problem: ${r.problem || "—"}<br>
+        Offer: ${r.offered_payment ? r.offered_payment + " SAR" : "—"}<br><br>
+        <button class="accept-btn" onclick="acceptRequest('${r.id}')">Accept</button>
+        <button class="reject-btn" onclick="rejectRequest('${r.id}')">Reject</button>
+      </div>
+    `).join("");
+  } catch (e) {
+    container.innerHTML = "<p>Failed to load pending requests.</p>";
+    console.error(e);
+  }
+}
+
+// ==================== ACCEPT ====================
+async function acceptRequest(id) {
+  try {
+    const res = await fetch(`/request/accept/${id}`, { method: "POST" });
+    if (res.ok) {
+      alert("Request accepted!");
+      loadPendingRequests();
+      loadActiveRequests();
+    } else alert("Failed");
+  } catch (e) { alert("Network error"); }
+}
+
+// ==================== REJECT ====================
+async function rejectRequest(id) {
+  try {
+    const res = await fetch(`/request/reject/${id}`, { method: "POST" });
+    if (res.ok) {
+      alert("Request rejected");
+      loadPendingRequests();
+    } else alert("Failed");
+  } catch (e) { alert("Network error"); }
+}
+
+// ==================== ACTIVE REQUESTS ====================
+async function loadActiveRequests() {
+  const container = document.getElementById("active-request-list");
+  try {
+    const res = await fetch(`/active/${mechanicId}`);
+    if (!res.ok) throw new Error();
+    const list = await res.json();
+
+    if (list.length === 0) {
+      container.innerHTML = "<p>No active jobs.</p>";
+      return;
+    }
+
+    container.innerHTML = list.map(r => `
+      <div class="card">
+        <strong>${r.user_name}</strong><br>
+        Phone: ${r.user_phone}<br>
+        Vehicle: ${r.vehicle}<br>
+        Problem: ${r.problem}<br><br>
+        <button class="done-btn" onclick="finishRequest('${r.id}')">Mark as Done</button>
+      </div>
+    `).join("");
+  } catch (e) {
+    container.innerHTML = "<p>Failed to load active jobs.</p>";
+  }
+}
+
+// ==================== FINISH / COMPLETE ====================
+async function finishRequest(id) {
+  const review = prompt("Review (optional):") || "";
+  let rating = 5;
+  const ratingIn = prompt("Rating (1-5):", "5");
+  if (ratingIn) {
+    rating = parseInt(ratingIn);
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      alert("Invalid rating");
+      return;
+    }
+  }
+
+  try {
+    const res = await fetch("/request/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, review, rating })
+    });
+
+    if (res.ok) {
+      alert("Job completed!");
+      loadActiveRequests();
+      loadHistory();
+    }
+  } catch (e) { alert("Error"); }
+}
+
+// ==================== HISTORY ====================
+async function loadHistory() {
+  const container = document.getElementById("history-requests");
+  try {
+    const res = await fetch(`/history/${mechanicId}`);
+    if (!res.ok) throw new Error();
+    const list = await res.json();
+
+    if (list.length === 0) {
+      container.innerHTML = "<p>No completed jobs yet.</p>";
+      return;
+    }
+
+    container.innerHTML = list.map(r => `
+      <div class="card">
+        <strong>${r.user_name}</strong> – ${r.vehicle}<br>
+        Problem: ${r.problem}<br>
+        Rating: ${r.rating || "—"}/5<br>
+        Review: ${r.review || "No review"}<br>
+        <small>${new Date(r.completed_at).toLocaleString()}</small>
+      </div>
+    `).join("");
+  } catch (e) {
+    container.innerHTML = "<p>Failed to load history.</p>";
+  }
+}
+
+// ==================== PROFILE ====================
+async function loadProfile() {
+  try {
+    const res = await fetch("/search/mechanics");
+    const mechs = await res.json();
+    const me = mechs.find(m => m.national_id === mechanicId);
+    if (!me) return;
+
+    document.getElementById("profile-name").value = me.name || "";
+    document.getElementById("profile-age").value = me.age || "";
+    document.getElementById("profile-email").value = me.email || "";
+    document.getElementById("profile-phone").value = me.phone || "";
+    document.getElementById("profile-address").value = me.location || "";
+    document.getElementById("profile-pic").src = me.photo || "/images/mechanics/default.jpg";
+  } catch (e) { console.error(e); }
+}
+
+// ==================== TABS ====================
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+    const tabId = btn.dataset.tab + "-tab";
+    document.getElementById(tabId).classList.add("active");
+    btn.classList.add("active");
+
+    if (btn.dataset.tab === "home") loadPendingRequests();
+    if (btn.dataset.tab === "active-requests") loadActiveRequests();
+    if (btn.dataset.tab === "requests") loadHistory();
+    if (btn.dataset.tab === "profile") loadProfile();
+  };
+});
+
+// Load the default tab (Pending) on start
+loadPendingRequests();
+</script>
+
+</body>
+</html>

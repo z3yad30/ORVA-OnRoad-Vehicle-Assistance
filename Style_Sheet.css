@@ -1,0 +1,84 @@
+:root {
+  --bg-gradient: linear-gradient(135deg, #1a1f2b, #2a2e45, #3d2b59);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --neon-purple: #c084fc;
+  --neon-cyan: #67e8f9;
+  --text-light: #e5e7eb;
+  --text-dim: #9ca3af;
+  --radius: 16px;
+  --transition: 0.25s ease;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-gradient);
+ /* background-image: url("images/logo_01.jpg");
+    background-repeat: no-repeat;
+    background-size: cover; */
+  background-attachment: fixed;
+  color: var(--text-light);
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 600;
+  background: -webkit-linear-gradient(var(--neon-purple), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1.6rem;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+}
+
+.btn {
+  background: var(--glass-bg);
+  padding: 12px 30px;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--text-light);
+  margin: 10px;
+  transition: var(--transition);
+}
+
+.btn:hover {
+  border-color: var(--neon-purple);
+  transform: scale(1.05);
+}
+
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+.buttons .btn {
+  margin: 0 10px;
+}

@@ -1,0 +1,133 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #007bff;
+  color: #fff;
+  position: relative;
+}
+
+#logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: absolute;
+  left: 20px;
+}
+
+nav #search {
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: none;
+  width: 220px;
+  margin-left: 160px;
+}
+
+nav .nav-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+nav .nav-btn:hover { background: rgba(255, 255, 255, 0.2); }
+nav .nav-btn.active { background: #fff; color: #007bff; }
+
+.tab { padding: 20px; }
+
+#mechanic-list .card,
+#request-list .card,
+#active-request-list .card,
+#your-review-list .card {
+  background: #fff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card b { font-weight: bold; }
+
+.card button {
+  margin-top: 8px;
+  margin-right: 5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.accept-btn { background: #28a745; color: #fff; }
+.reject-btn { background: #dc3545; color: #fff; }
+.cancel-btn { background: #ffc107; color: #fff; }
+.end-btn { background: #17a2b8; color: #fff; }
+
+.card button:hover { opacity: 0.9; }
+
+#profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  margin: 40px auto;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#profile-form input,
+#request-list input,
+#request-list select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#profile-form button,
+#request-list button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#profile-form button:hover,
+#request-list button:hover { background-color: #0056b3; }
+
+#profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  object-fit: cover;
+  align-self: center;
+}
