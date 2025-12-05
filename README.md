@@ -32,7 +32,7 @@ README: |
   ---
 
   ## 📂 Project Structure
-
+```
 ORVA-OnRoad-Vehicle-Assistance/
 │
 ├── index.html
@@ -78,7 +78,7 @@ ORVA-OnRoad-Vehicle-Assistance/
 ├── pending_requests.json
 └── history_requests.json
 
-
+```
 
 ---
 
